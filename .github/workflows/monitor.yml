@@ -68,10 +68,27 @@ jobs:
       # ── 4. Instala o Chromium (necessário para o Playwright) ────────────
       - name: 🌐 Install Playwright browsers
         run: |
-          # PT: Corrige incompatibilidade do libasound2 no Ubuntu 24.04
-          # EN: Fixes libasound2 incompatibility on Ubuntu 24.04
-          sudo apt-get install -y libasound2t64
-          playwright install chromium --with-deps
+          # PT: Instala dependências do sistema manualmente (Ubuntu 24.04)
+          # EN: Install system dependencies manually (Ubuntu 24.04)
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            libasound2t64 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libgbm1 \
+            libgtk-3-0 \
+            libnspr4 \
+            libnss3 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxkbcommon0 \
+            libxrandr2
+          # PT: Instala só o browser, sem tentar gerenciar dependências
+          # EN: Install only the browser, without trying to manage dependencies
+          playwright install chromium
         # PT: "--with-deps" instala as bibliotecas de sistema necessárias
         # EN: "--with-deps" installs required system libraries
 
