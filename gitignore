@@ -1,0 +1,22 @@
+# PT: Arquivos que o Git deve IGNORAR (nunca versionar)
+# EN: Files that Git should IGNORE (never commit)
+
+# PT: Variáveis de ambiente com credenciais reais — NUNCA commitar!
+# EN: Environment variables with real credentials — NEVER commit!
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Playwright
+/playwright/.local-browsers/
+
+# OS
+.DS_Store
+Thumbs.db
