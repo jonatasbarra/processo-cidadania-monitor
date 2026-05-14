@@ -1,0 +1,110 @@
+# .github/workflows/monitor.yml
+#
+# PT: Workflow do GitHub Actions que executa o monitor diariamente às 08:00 BRT.
+#     Também pode ser disparado manualmente pela aba "Actions" do GitHub.
+#
+# EN: GitHub Actions workflow that runs the monitor daily at 08:00 BRT.
+#     Can also be triggered manually from the GitHub "Actions" tab.
+#
+# Como funciona / How it works:
+#   1. PT: O GitHub aluga uma máquina virtual Ubuntu gratuita
+#      EN: GitHub spins up a free Ubuntu virtual machine
+#   2. PT: Instala Python, dependências e o Chromium (para o Playwright)
+#      EN: Installs Python, dependencies and Chromium (for Playwright)
+#   3. PT: Roda main.py com as credenciais injetadas via Secrets
+#      EN: Runs main.py with credentials injected via Secrets
+#   4. PT: Faz commit do state.json atualizado de volta ao repositório
+#      EN: Commits the updated state.json back to the repository
+
+name: 🇮🇹 Italian Citizenship Case Monitor
+
+on:
+  # PT: Executa diariamente — cron usa UTC, então 11:00 UTC = 08:00 BRT
+  # EN: Runs daily — cron uses UTC, so 11:00 UTC = 08:00 BRT
+  schedule:
+    - cron: "0 11 * * *"
+
+  # PT: Permite disparar manualmente pelo painel do GitHub
+  # EN: Allows manual trigger from the GitHub dashboard
+  workflow_dispatch:
+    inputs:
+      force_notify:
+        description: "Force email even without changes? (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  monitor:
+    name: Check case & notify
+    runs-on: ubuntu-latest  # PT: máquina virtual gratuita / EN: free virtual machine
+
+    # PT: Permissão para escrever no repositório (necessário para o commit do state.json)
+    # EN: Permission to write to the repository (needed to commit state.json)
+    permissions:
+      contents: write
+
+    steps:
+      # ── 1. Clona o repositório ──────────────────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # PT: Busca o histórico completo para que o git diff funcione
+          # EN: Fetch full history so git diff works
+          fetch-depth: 0
+
+      # ── 2. Configura Python ─────────────────────────────────────────────
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"  # PT: cacheia dependências para acelerar runs futuras
+                        # EN: caches dependencies to speed up future runs
+
+      # ── 3. Instala dependências Python ──────────────────────────────────
+      - name: 📦 Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # ── 4. Instala o Chromium (necessário para o Playwright) ────────────
+      - name: 🌐 Install Playwright browsers
+        run: playwright install chromium --with-deps
+        # PT: "--with-deps" instala as bibliotecas de sistema necessárias
+        # EN: "--with-deps" installs required system libraries
+
+      # ── 5. Executa o monitor ─────────────────────────────────────────────
+      - name: 🔍 Run case monitor
+        env:
+          # PT: Estas variáveis são injetadas dos GitHub Secrets — nunca
+          #     aparecem nos logs nem no código. Veja o README para configurar.
+          # EN: These variables are injected from GitHub Secrets — they never
+          #     appear in logs or code. See README to configure.
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL:       ${{ secrets.NOTIFY_EMAIL }}
+          CASE_NUMBER:        ${{ secrets.CASE_NUMBER }}
+          CASE_YEAR:          ${{ secrets.CASE_YEAR }}
+        run: |
+          # PT: Se o workflow foi disparado manualmente com force_notify=true,
+          #     passa a flag para o script
+          # EN: If workflow was manually triggered with force_notify=true,
+          #     pass the flag to the script
+          if [ "${{ github.event.inputs.force_notify }}" = "true" ]; then
+            python main.py --force-notify
+          else
+            python main.py
+          fi
+
+      # ── 6. Commita o state.json atualizado ──────────────────────────────
+      - name: 💾 Commit updated state
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # PT: Só faz commit se o state.json realmente mudou
+          # EN: Only commit if state.json actually changed
+          if git diff --quiet state.json; then
+            echo "state.json unchanged — nothing to commit."
+          else
+            git add state.json
+            git commit -m "chore: update case state [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git push
+          fi
