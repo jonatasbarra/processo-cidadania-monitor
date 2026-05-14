@@ -36,7 +36,7 @@ on:
 jobs:
   monitor:
     name: Check case & notify
-    runs-on: ubuntu-latest  # PT: máquina virtual gratuita / EN: free virtual machine
+    runs-on: ubuntu-latest # PT: máquina virtual gratuita / EN: free virtual machine
 
     # PT: Permissão para escrever no repositório (necessário para o commit do state.json)
     # EN: Permission to write to the repository (needed to commit state.json)
@@ -57,8 +57,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"  # PT: cacheia dependências para acelerar runs futuras
-                        # EN: caches dependencies to speed up future runs
+          cache:
+            "pip" # PT: cacheia dependências para acelerar runs futuras
+            # EN: caches dependencies to speed up future runs
 
       # ── 3. Instala dependências Python ──────────────────────────────────
       - name: 📦 Install Python dependencies
@@ -66,7 +67,11 @@ jobs:
 
       # ── 4. Instala o Chromium (necessário para o Playwright) ────────────
       - name: 🌐 Install Playwright browsers
-        run: playwright install chromium --with-deps
+        run: |
+          # PT: Corrige incompatibilidade do libasound2 no Ubuntu 24.04
+          # EN: Fixes libasound2 incompatibility on Ubuntu 24.04
+          sudo apt-get install -y libasound2t64
+          playwright install chromium --with-deps
         # PT: "--with-deps" instala as bibliotecas de sistema necessárias
         # EN: "--with-deps" installs required system libraries
 
@@ -77,11 +82,11 @@ jobs:
           #     aparecem nos logs nem no código. Veja o README para configurar.
           # EN: These variables are injected from GitHub Secrets — they never
           #     appear in logs or code. See README to configure.
-          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL:       ${{ secrets.NOTIFY_EMAIL }}
-          CASE_NUMBER:        ${{ secrets.CASE_NUMBER }}
-          CASE_YEAR:          ${{ secrets.CASE_YEAR }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          CASE_NUMBER: ${{ secrets.CASE_NUMBER }}
+          CASE_YEAR: ${{ secrets.CASE_YEAR }}
         run: |
           # PT: Se o workflow foi disparado manualmente com force_notify=true,
           #     passa a flag para o script
