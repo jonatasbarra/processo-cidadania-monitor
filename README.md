@@ -178,8 +178,8 @@ python main.py
 | `GMAIL_USER` | seu_email@gmail.com |
 | `GMAIL_APP_PASSWORD` | senha de app de 16 dígitos / 16-digit app password |
 | `NOTIFY_EMAIL` | e-mail que receberá notificações / email to receive notifications |
-| `CASE_NUMBER` | `3702` |
-| `CASE_YEAR` | `2024` |
+| `CASE_NUMBER` | `XXXX` |
+| `CASE_YEAR` | `XXXX` |
 
 ---
 
@@ -200,11 +200,11 @@ python main.py
 ## 📧 Exemplos de e-mail / Email examples
 
 **Primeira execução / First run:**
-> ✅ **[Monitor Ativo] Processo 3702/2024 — Sem alterações**
+> ✅ **[Monitor Ativo] Processo XXXX/2024 — Sem alterações**
 > O monitoramento diário está configurado e funcionando.
 
 **Quando há atualização / When there's an update:**
-> 🔔 **[ATUALIZAÇÃO] Processo 3702/2024 — 1 mudança(s)**
+> 🔔 **[ATUALIZAÇÃO] Processo XXXX/2024 — 1 mudança(s)**
 > Status: ATTESA DEPOSITO NOTE IN SOSTITUZIONE UDIENZA → [NOVO STATUS]
 
 ---
