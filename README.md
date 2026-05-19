@@ -136,8 +136,8 @@ Edite o `.env` com seus dados reais / Edit `.env` with your real data:
 GMAIL_USER=seu_email@gmail.com
 GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
 NOTIFY_EMAIL=seu_email@gmail.com
-CASE_NUMBER=3702
-CASE_YEAR=2024
+CASE_NUMBER=XXXX
+CASE_YEAR=XXXX
 ```
 
 ---
